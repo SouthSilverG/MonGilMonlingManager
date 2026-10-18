@@ -43,6 +43,9 @@ for m in monsters:
         levels.append({'effects':granted,'categories':effect_categories,'level':c['upgrade_level'],'element':element,'cooldown':c['cooldown_seconds'],'damage':c['damage_percent'],'condition':c['condition_text'],'text':text})
     result.append({'id':str(b['monster_id']),'name':m['name'],'image':m['image'],'recipe':str(b['monster_id']) in recipe_ids,'categories':categories(effects[0]),'effects':effects,'cooldown':float(re.search(r'([\d.]+)초에 1회',effects[0])[1]) if re.search(r'([\d.]+)초에 1회',effects[0]) else None,'chains':levels})
 assert len(result)==196 and len({r['id'] for r in result})==196
+recipe_effects=[{k:r[k] for k in ['id','name','effects','cooldown','categories']}|{'chains':[{k:c[k] for k in ['level','effects','condition','cooldown','categories']} for c in r['chains']]} for r in result if r['id'] in recipe_ids]
+assert len(recipe_effects)==len(recipe_ids)
+(ROOT/'recipes/effects-data.js').write_text('/* Selected-monster summaries; loaded only after selection. */\nwindow.MONLING_RECIPE_EFFECTS='+json.dumps(recipe_effects,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
 (ROOT/'catalog-data.js').write_text('/* Generated; no raw tables at runtime. */\nwindow.MONLING_CATALOG='+json.dumps(result,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
 # Copy only images referenced by this catalog or recipes. Each repository can deploy independently.
 recipe=json.loads((ROOT/'recipes/data.js').read_text(encoding='utf-8').split('window.MONGIL_RECIPES = ',1)[1].rstrip().rstrip(';'))
