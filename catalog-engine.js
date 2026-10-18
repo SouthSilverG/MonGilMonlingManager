@@ -1,0 +1,5 @@
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.MonlingCatalog=api;})(typeof window==='undefined'?globalThis:window,function(){
+'use strict';const normalize=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'');
+function filter(rows,options={}){const q=normalize(options.query);return rows.filter(r=>(!q||normalize(r.name+' '+r.effects.join(' ')+' '+r.chains.map(c=>c.text).join(' ')).includes(q))&&(!options.chainElement||r.chains.some(c=>options.chainElement==='기타'?c.categories.some(a=>['물리','물','암흑'].includes(a)):c.categories.includes(options.chainElement)))&&(!options.breedElement||(options.breedElement==='기타'?r.categories.some(c=>!['공용','땅','바람','번개','불','얼음'].includes(c)):r.categories.includes(options.breedElement)))&&(!options.hasChain||(options.hasChain==='yes'?r.chains.length>0:r.chains.length===0)));}
+function chain(row,level){return row.chains.find(c=>c.level===level)||row.chains[0]||null;}
+return {filter,chain};});
